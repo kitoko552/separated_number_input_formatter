@@ -40,7 +40,10 @@ class SeparatedNumberInputFormatter extends TextInputFormatter {
         manipulated += char;
       }
     }
-    manipulated = manipulated.trimRight();
+
+    if (manipulated.endsWith(separator)) {
+      manipulated = manipulated.substring(0, manipulated.length - 1);
+    }
 
     final trimmedOldText = oldValue.text.replaceAll(separator, '');
     int selectionOffset = newValue.selection.baseOffset;

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:separated_number_input_formatter/separated_number_input_formatter.dart';
 
 void main() => runApp(ExampleApp());
 
@@ -16,13 +17,41 @@ class ExampleApp extends StatelessWidget {
   }
 }
 
-class ExamplePage extends StatelessWidget {
+class ExamplePage extends StatefulWidget {
   const ExamplePage();
 
+  @override
+  _ExamplePageState createState() => _ExamplePageState();
+}
+
+class _ExamplePageState extends State<ExamplePage> {
   static const textFieldTitleStyle = TextStyle(
     color: Colors.black,
     fontSize: 12.0,
   );
+
+  int _digits = 4;
+  String _separator = '-';
+
+  TextEditingController _textController;
+  TextEditingController _digitsController;
+  TextEditingController _separatorController;
+
+  @override
+  void initState() {
+    super.initState();
+    _textController = TextEditingController();
+    _digitsController = TextEditingController(text: _digits.toString());
+    _separatorController = TextEditingController(text: _separator);
+  }
+
+  @override
+  void dispose() {
+    _separatorController.dispose();
+    _digitsController.dispose();
+    _textController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,9 +70,11 @@ class ExamplePage extends StatelessWidget {
               style: textFieldTitleStyle,
             ),
             TextField(
+              controller: _textController,
               maxLines: 1,
+              keyboardType: TextInputType.number,
               inputFormatters: [
-//                SeparatedNumberInputFormatter(4),
+                SeparatedNumberInputFormatter(_digits, separator: _separator),
               ],
             ),
             const SizedBox(height: 24.0),
@@ -59,7 +90,7 @@ class ExamplePage extends StatelessWidget {
                 SizedBox(width: 16.0),
                 Expanded(
                   child: Text(
-                    'separator\n(default is a space)',
+                    'separator',
                     style: textFieldTitleStyle,
                   ),
                 ),
@@ -69,20 +100,36 @@ class ExamplePage extends StatelessWidget {
               children: [
                 Expanded(
                   child: TextField(
+                    controller: _digitsController,
                     maxLines: 1,
                     keyboardType: TextInputType.number,
                     inputFormatters: [
                       WhitelistingTextInputFormatter.digitsOnly,
                     ],
+                    onChanged: (digits) {
+                      setState(() {
+                        _digits = int.parse(digits);
+                        _textController.text = '';
+                      });
+                    },
                   ),
                 ),
                 const SizedBox(width: 16.0),
                 Expanded(
                   child: TextField(
+                    controller: _separatorController,
                     maxLines: 1,
                     inputFormatters: [
                       BlacklistingTextInputFormatter(RegExp(r'\d+')),
                     ],
+                    onChanged: (separator) {
+                      setState(() {
+                        if (separator.isNotEmpty) {
+                          _separator = separator;
+                        }
+                        _textController.text = '';
+                      });
+                    },
                   ),
                 ),
               ],

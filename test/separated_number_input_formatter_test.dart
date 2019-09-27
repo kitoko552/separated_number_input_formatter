@@ -99,6 +99,21 @@ void main() {
       expect(output.selection, const TextSelection.collapsed(offset: 3));
     });
 
+    test('inserts a number to before a separator', () {
+      output = formatter.formatEditUpdate(
+        TextEditingValue(
+          text: '123',
+          selection: const TextSelection.collapsed(offset: 3),
+        ),
+        TextEditingValue(
+          text: '1234',
+          selection: const TextSelection.collapsed(offset: 4),
+        ),
+      );
+      expect(output.text, '1234');
+      expect(output.selection, const TextSelection.collapsed(offset: 4));
+    });
+
     test(
       '(digitsの倍数 + 1)桁目を入力した時は空白の次に数字が入力されるためその先にキャレットを移動',
       () {
